@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/new/Fond">
+        <file>Lyon1.png</file>
+    </qresource>
+    <qresource prefix="/new/MenuBarre">
+        <file>new_file.png</file>
+        <file>enregestre.png</file>
+        <file>close.png</file>
+    </qresource>
+    <qresource prefix="/new/button">
+        <file>Refresh.png</file>
+    </qresource>
+</RCC>
