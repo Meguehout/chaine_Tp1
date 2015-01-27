@@ -6,22 +6,17 @@ class ImageTraiter : public Image
 {
 public:
 
-    ImageTraiter();
+  ImageTraiter();
 
-    void fctCorespondance(const int *tablDeCorespondance);
+  void fctCorespondance(int *tablDeCorespondance, int canaux = 0);
 
-    void egalisationHisto (int *tabEgalisation) const;
+  static int *inverstionHisto();
+  int *egalisationHisto () const;
+  static int *recadrageHisto(int min=0, int max=255);
+  static int *seuillageHisto (int seuil = 128);
 
-    void recadrageHisto (int *tabRecadrage, int min=0, int max=150);
-
-    void inverstionHisto (int *tabNegative) const;
-
-    void seuillageHisto (int *tabBinarisation, int seuil = 128) const;
-
-//    void ameliorationParHisto();
-
-
-
+  void rgb2yuv();
+  void yuv2rgb();
 };
 
 #endif // TRAITEMENT_H

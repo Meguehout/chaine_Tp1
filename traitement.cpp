@@ -3,74 +3,111 @@
 #include <string.h>
 #include <stdlib.h>
 #include <cmath>
-using namespace std;
 
 ImageTraiter::ImageTraiter() : Image()
 {}
 
-void ImageTraiter::fctCorespondance(const int *tablDeCorespondance)
+void ImageTraiter::fctCorespondance(int *tablDeCorespondance , int canaux)
 {
-   //cout << "m_nbrLigne = "<< m_nbrLigne <<" m_nbrColone = "<< m_nbrColone <<endl;
-        for (int i = 0; i < m_nbrLigne; i++)
-        {
-            for (int j = 0; j < m_nbrColone; j++)
-            {//cout << "deja en NG1"<<endl;
-             m_bufferImage[i][j] = tablDeCorespondance[m_bufferImage[i][j]];
-            }
-        }
-      //  cout << "deja en NG"<<endl;
-}
+  if(canaux == 0)canaux = m_nbrCanaux;
 
-
-void ImageTraiter::egalisationHisto(int *tabEgalisation) const
-{
-    Histogramme histo;
-
-    float n = m_nbrLigne * m_nbrColone;
-
-    histo.calculHistCumule(*this , tabEgalisation);
-
-    for(int i = 0; i < 256; i++)
+  for (int i = 0; i < m_imageSize; ++i)
     {
-        tabEgalisation[i] = round(255.0 * (tabEgalisation[i]/n));//formul du prof
+      for (int j = 0; j < canaux; ++j)
+          m_bufferImage[i][j] = tablDeCorespondance[m_bufferImage[i][j]];
     }
+
+  delete (tablDeCorespondance);
 }
 
-void ImageTraiter::recadrageHisto(int *tabRecadrage, int min, int max)
+///***************************************************************/
+int *ImageTraiter::egalisationHisto() const
 {
-    for(int i = 0; i < 256; i++)
+  Histogramme histo(m_nbrCanaux);
+
+  float n = m_imageSize;
+
+  int *tabEgalisation =  new int[256];
+
+  histo.calculHistCumule(*this);
+
+  tabEgalisation = histo.getHistCumule();
+
+  for(int i = 0; i < 256; ++i)
+      tabEgalisation[i] = round(255.0 * (tabEgalisation[i]/n));
+
+  return tabEgalisation;
+}
+
+///*********************************************************/
+int *ImageTraiter::recadrageHisto(int min, int max)
+{
+  int *tabRecadrage = new int[255];
+  for(int i = 0; i < 256; ++i)
     {
-        tabRecadrage[i] = abs(round((255.0 * (i-min)) / (max - min)));
+     if((min <= i)&&(i <= max))
+       tabRecadrage[i] = round((255.0 * (i-min)) / (max - min));
+     else if (i < min)
+       tabRecadrage[i] = 0;
+     else
+       tabRecadrage[i] = 255;
     }
+  return tabRecadrage;
 }
-
-void ImageTraiter::inverstionHisto(int *tabNegative) const
+///**********************************************************/
+int *ImageTraiter::inverstionHisto()
 {
-    int niv=255;
-
-    for(int i = 0; i < 256; i++)
-       {
-            tabNegative[i]= niv;
-            niv--;
-       }
-   // cout << "deja inverser"<<endl;
-}
-
-void ImageTraiter::seuillageHisto(int *tabBinarisation, int seuil) const
-{
+  int niv=255;
+  int *tabNegative = new int[256];
 
   for(int i = 0; i < 256; i++)
     {
-       if (i < seuil) tabBinarisation[i]= 0;
-       else tabBinarisation[i]= 255;
+      tabNegative[i]= niv;
+      niv--;
+    }
+  return tabNegative;
+}
+
+int *ImageTraiter::seuillageHisto(int seuil)
+{
+  int *tabBinarisation = new int[256];
+  for(int i = 0; i < 256; i++)
+    {
+      if (i < seuil) tabBinarisation[i]= 0;
+      else tabBinarisation[i]= 255;
+    }
+  return tabBinarisation;
+}
+///**********RGB -> YUV ****************//
+void ImageTraiter::rgb2yuv()
+{
+  int R,G,B;
+
+  for(int i = 0; i < this->m_imageSize; i++)
+    {
+      R = this->m_bufferImage[i][0];
+      G = this->m_bufferImage[i][1];
+      B = this->m_bufferImage[i][2];
+
+      this->m_bufferImage[i][0] = 0.299*R + 0.587*G + 0.114*B;
+      this->m_bufferImage[i][1] = abs(-(0.169*R) - (0.331*G) + (0.500*B) + 128.0);
+      this->m_bufferImage[i][2] = abs((0.500*R) - (0.419*G) - (0.081*B) + 128.0);
+    }
+
+}
+///***************YUV -> RGB*************//
+void ImageTraiter::yuv2rgb()
+{
+  int y,u,v;
+
+  for(int i = 0; i < this->m_imageSize; i++)
+    {
+      y = this->m_bufferImage[i][0];
+      u = this->m_bufferImage[i][1];
+      v = this->m_bufferImage[i][2];
+
+      this->m_bufferImage[i][0] = abs(1 * y -  0.0009267*(u-128) + 1.4016868*(v-128));
+      this->m_bufferImage[i][1] = abs(1 * y -  0.3436954*(u-128) - 0.7141690*(v-128));
+      this->m_bufferImage[i][2] = abs(1 * y +  1.7721604*(u-128) + 0.0009902*(v-128));
     }
 }
-//void ImageTraiter::ameliorationParHisto()
-//{
-
-//}
-
-//void histogrammeCumule(Histogramme )
-//{
-
-//}

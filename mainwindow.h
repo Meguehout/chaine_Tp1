@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include "image.h"
 #include "traitement.h"
+#include "histogramme.h"
 #include <QMainWindow>
 
 namespace Ui {
@@ -40,6 +41,10 @@ private slots:
 
     void on_actionFermer_triggered();
 
+    void on_histogramme_clicked();
+
+    void on_cumule_clicked();
+
 private:
     Ui::MainWindow *ui;
     ImageTraiter _image;
@@ -47,7 +52,8 @@ private:
 
     void UpdateView();
     void Binarisation(int value);
-    void recadrage(int min=0, int max=150);
+    void recadrage(int min=0, int max=255);
+
 };
 
 #endif // MAINWINDOW_H

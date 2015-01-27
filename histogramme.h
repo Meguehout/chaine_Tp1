@@ -1,24 +1,37 @@
 #ifndef HISTOGRAMME_H
 #define HISTOGRAMME_H
 
+#include <QDialog>
 #include "image.h"
+#include "qcustomplot.h"
 
-class Histogramme
+#define Y 1
+
+namespace Ui {
+  class Histogramme;
+}
+
+class Histogramme : public QDialog
 {
+  Q_OBJECT
+
 public:
-    Histogramme();
+  explicit Histogramme(int typeImage, QWidget *parent = 0);
 
-    void calculHist(Image image);
+  void calculHistOcc(Image image, bool draw = false);
+  void calculHistCumule(Image image, bool draw = false);
+  void sauveHisto (std::string chemainDeSauve) const;
+  int *getHistCumule (){return m_tabHistCumule;}
 
-    void calculHistCumule(Image image, int * tabHistCumule = NULL);
+  void DrawHisto(QCustomPlot *customPlot, int *data, int nbrGraphe, QString name);
 
-
-
-    void sauveHisto (std::string chemainDeSauve) const;
+  ~Histogramme();
 
 private:
-    int m_tabHistOccu [256];
-    int m_tabHistCumule [256];
+  Ui::Histogramme *ui;
+
+  int *m_tabHistOccu;// [256];
+  int *m_tabHistCumule; //[256];
 };
 
 #endif // HISTOGRAMME_H
